@@ -204,6 +204,64 @@ class LobiAPI:
 			"fields": "subleaders"
 		})
 
+	def GetGroupLeader(self, group_id):
+		return self.GET(2, "group/{group_id}/members".format(group_id=group_id), {
+			"members_count": 1,
+			"fields": "owner"
+		}).get("owner")
+
+	def GetGroupSubleaders(self, group_id):
+		res = self.GET(2, "group/{group_id}/members".format(group_id=group_id), {
+			"members_count": 1,
+			"fields": "owner"
+		}).get("subleaders")
+		if res == None:
+			return []
+		return res
+
+	def GetGroupMembersAll(self, group_id):
+		result = []
+		data = { "members_count": "1000" }
+		while True:
+			res = self.GET(1, "group/{group_id}/members".format(group_id=group_id), data)
+			if res == None or res.get("members") == None or len(res["members"]) == 0:
+				break
+			result.extend(res["members"])
+			if res.get("next_cursor") == None or res["next_cursor"] == -1 or res["next_cursor"] == 0:
+				break
+			data["cursor"] = res["next_cursor"]
+		return result
+
+	def GetThreads(self, group_id, count = 20, older_than = None, newer_than = None):
+		data = { "count": count }
+		if older_than != None and older_than != "":
+			data["older_than"] = older_than
+		if newer_than != None and newer_than != "":
+			data["newer_than"] = newer_than
+		return self.GET(2, "group/{group_id}/chats".format(group_id=group_id), data)
+
+	def GetRepliesAll(self, group_id, chat_id):
+		return self.GET(1, "group/{group_id}/chats/replies".format(group_id=group_id), { "to": chat_id })
+
+	def GetPokesAll(self, group_id, chat_id):
+		result = []
+		data = { "id": chat_id }
+		while True:
+			res = self.GET(2, "group/{group_id}/chats/pokes".forma(group_id=group_id), data)
+			if res == None or res.get("users") == None or len(res["users"]) == 0:
+				break
+			result.extend(res["users"])
+			if res.get("next_cursor") == None or res["next_cursor"] == -1 or res["next_cursor"] == 0:
+				break
+			data["cursor"] = res["next_cursor"]
+		return result
+
+	def GetNotifications(self, count = 20, cursor = None):
+		data = { "count": count }
+		if cursor != None and cursor != "":
+			data["last_cursor"] = cursor
+		return self.GET(2, "info/nontifications", data)
+
 	def GET(self, version, request_url, query = {}):
 		url = "https://api.lobi.co/{version}/{request_url}?platform={platform}&lang=ja&token={token}&{query}".format(version=version, request_url=request_url, platform=self.platform, token=self.Token, query=urllib.urlencode(query))
 		header = {
@@ -217,4 +275,5 @@ if api.Login("メールアドレス", "パスワード"):
 	me = api.GetMe()
 	print "####################   " + me["name"] + "   ####################"
 	print me["description"]
+	me_contacts = api.GetContacts()
 
