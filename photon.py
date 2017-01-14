@@ -270,6 +270,19 @@ class LobiAPI:
 		}
 		return json.loads(urllib2.urlopen(urllib2.Request(url, None, header)).read())
 
+	def POST(self, version, request_url, query = {}):
+		url = "https://api.lobi.co/{version}/{request_url}".format(version=version, request_url=request_url)
+		header = {
+			"User-Agent": self.UserAgent,
+			"Host": "api.lobi.co"
+		}
+		data = {
+			"lang": "ja",
+			"token": self.Token,
+			"platform": self.platform
+		}.extend(query)
+		return json.loads(urllib2.urlopen(urllib2.Request(url, data, header)).read())
+
 api = LobiAPI()
 if api.Login("メールアドレス", "パスワード"):
 	me = api.GetMe()
