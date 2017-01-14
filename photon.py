@@ -262,6 +262,51 @@ class LobiAPI:
 			data["last_cursor"] = cursor
 		return self.GET(2, "info/nontifications", data)
 
+	def Like(self, group_id, chat_id):
+		return self.POST(1, "group/{group_id}/chats/like".format(group_id=group_id), { "id": chat_id })
+
+	def UnLike(self, group_id, chat_id):
+		return self.POST(1, "group/{group_id}/chats/unlike".format(group_id=group_id), { "id": chat_id })
+
+	def Boo(self, group_id, chat_id):
+		return self.POST(1, "group/{group_id}/chats/boo".format(group_id=group_id), { "id": chat_id })
+
+	def UnBoo(self, group_id, chat_id):
+		return self.POST(1, "group/{group_id}/chats/unboo".format(group_id=group_id), { "id": chat_id })
+
+	def Follow(self, user_id):
+		return self.POST(1, "me/contacts", { "users": user_id })
+
+	def UnFollow(self, user_id):
+		return self.POST(1, "me/contacts/remove", { "users": user_id })
+
+	def RemoveChat(self, group_id, chat_id):
+		return self.POST(1, "group/{group_id}/chats/remove".format(group_id=group_id), { "id": chat_id })
+
+	def Join(self, group_id):
+		return self.POST(1, "group/{group_id}/join".format(group_id=group_id), {})
+
+	def RefuseInvitation(self, group_id):
+		return self.POST(1, "group/{group_id}/refuse_invitation".format(group_id=group_id), {})
+
+	def Kick(self, group_id, user_id):
+		return self.POST(1, "group/{group_id}/kick".format(group_id=group_id), { "target_user": user_id })
+
+	def LeaderTransfer(self, group_id, user_id):
+		return self.POST(1, "group/{group_id}/transfer".format(group_id=group_id), { "target_user": user_id })
+
+	def SetSubleader(self, group_id, user_id):
+		return self.POST(1, "group/{group_id}/subleaders".format(group_id=group_id), { "user": user_id })
+
+	def RemoveSubleader(self, group_id, user_id):
+		return self.POST(1, "group/{group_id}/subleaders/remove".format(group_id=group_id), { "user": user_id })
+
+	def Block(self, user_id):
+		return self.POST(1, "me/blocking_users", { "users": user_id })
+
+	def Unblock(self, user_id):
+		return self.POST(1, "me/blocking_users/remove", { "users": user_id })
+
 	def GET(self, version, request_url, query = {}):
 		url = "https://api.lobi.co/{version}/{request_url}?platform={platform}&lang=ja&token={token}&{query}".format(version=version, request_url=request_url, platform=self.platform, token=self.Token, query=urllib.urlencode(query))
 		header = {
